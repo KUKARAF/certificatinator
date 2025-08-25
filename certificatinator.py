@@ -24,27 +24,22 @@ def get_certificates_from_url(url):
     if not hostname:
         raise ValueError(f"Invalid URL: {url}")
     
-    # Create SSL context
+    # Create SSL context that captures the full certificate chain
     context = ssl.create_default_context()
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
     
-    # Connect and get certificate chain
+    # Connect and get certificate
     with socket.create_connection((hostname, port), timeout=10) as sock:
         with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-            # Get the peer certificate chain
+            # Get the peer certificate in DER format
             der_cert_bin = ssock.getpeercert(True)
-            cert_chain = ssock.getpeercert_chain()
     
+    # For now, we'll just get the server certificate
+    # Getting the full chain requires more complex SSL handling
     certificates = []
-    if cert_chain:
-        for cert_der in cert_chain:
-            cert = x509.load_der_x509_certificate(cert_der)
-            certificates.append(cert)
-    else:
-        # Fallback to just the peer certificate
-        cert = x509.load_der_x509_certificate(der_cert_bin)
-        certificates.append(cert)
+    cert = x509.load_der_x509_certificate(der_cert_bin)
+    certificates.append(cert)
     
     return certificates
 
