@@ -17,6 +17,8 @@ import re
 
 # Suppress cryptography deprecation warnings for negative serial numbers
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="cryptography")
+from cryptography.utils import CryptographyDeprecationWarning
+warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 
 
 def get_certificates_from_url(url):
