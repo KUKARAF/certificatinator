@@ -174,8 +174,8 @@ def main():
             
             print(f"\nCertificate {i}: {subject_cn}")
             print(f"Issuer: {cert.issuer.rfc4514_string()}")
-            print(f"Valid from: {cert.not_valid_before}")
-            print(f"Valid until: {cert.not_valid_after}")
+            print(f"Valid from: {cert.not_valid_before_utc}")
+            print(f"Valid until: {cert.not_valid_after_utc}")
             
             while True:
                 response = input("Add this certificate to the bundle? (y/n): ").lower().strip()
