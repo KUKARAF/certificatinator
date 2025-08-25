@@ -1,3 +1,38 @@
+[project]
+name = "certificatinator"
+version = "0.1.0"
+description = "A tool to manage SSL certificates in certifi-style bundles"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "cryptography>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0.0",
+    "pytest-cov>=2.10.0",
+    "flake8>=3.8.0",
+    "black>=21.0.0",
+    "isort>=5.0.0",
+    "bandit>=1.7.0",
+    "safety>=1.10.0",
+]
+
+[project.scripts]
+certificatinator = "certificatinator:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
+
 [tool.black]
 line-length = 88
 target-version = ['py38']
