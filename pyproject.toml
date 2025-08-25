@@ -20,10 +20,10 @@ extend-exclude = '''
 profile = "black"
 multi_line_output = 3
 line_length = 88
-known_first_party = ["certificator"]
+known_first_party = ["certificatinator"]
 
 [tool.coverage.run]
-source = ["certificator"]
+source = ["certificatinator"]
 omit = [
     "*/tests/*",
     "*/test_*",

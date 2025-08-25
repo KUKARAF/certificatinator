@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests for the certificator module.
+Tests for the certificatinator module.
 """
 
 import unittest
@@ -15,10 +15,10 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 from datetime import datetime, timedelta
 
-import certificator
+import certificatinator
 
 
-class TestCertificator(unittest.TestCase):
+class TestCertificatinator(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
@@ -62,7 +62,7 @@ class TestCertificator(unittest.TestCase):
     def test_get_certificates_from_url_invalid_url(self):
         """Test get_certificates_from_url with invalid URL."""
         with self.assertRaises(ValueError):
-            certificator.get_certificates_from_url("invalid-url")
+            certificatinator.get_certificates_from_url("invalid-url")
 
     @patch('socket.create_connection')
     @patch('ssl.create_default_context')
@@ -82,7 +82,7 @@ class TestCertificator(unittest.TestCase):
         mock_ssl_context.return_value = mock_context
         
         # Test the function
-        certs = certificator.get_certificates_from_url("https://example.com")
+        certs = certificatinator.get_certificates_from_url("https://example.com")
         
         self.assertEqual(len(certs), 1)
         self.assertIsInstance(certs[0], x509.Certificate)
@@ -93,11 +93,11 @@ class TestCertificator(unittest.TestCase):
         mock_socket.side_effect = socket.error("Connection failed")
         
         with self.assertRaises(socket.error):
-            certificator.get_certificates_from_url("https://example.com")
+            certificatinator.get_certificates_from_url("https://example.com")
 
     def test_parse_existing_certificates_file_not_found(self):
         """Test parsing when certificate file doesn't exist."""
-        result = certificator.parse_existing_certificates("nonexistent_file.pem")
+        result = certificatinator.parse_existing_certificates("nonexistent_file.pem")
         self.assertEqual(result, set())
 
     def test_parse_existing_certificates_with_valid_certs(self):
@@ -111,7 +111,7 @@ class TestCertificator(unittest.TestCase):
 {self.test_cert_pem}"""
         
         with patch('builtins.open', mock_open(read_data=cert_content)):
-            result = certificator.parse_existing_certificates("test.pem")
+            result = certificatinator.parse_existing_certificates("test.pem")
             
         # Should find 2 certificates (same cert twice)
         self.assertEqual(len(result), 1)  # Same fingerprint, so only 1 unique
@@ -128,13 +128,13 @@ INVALID_CERTIFICATE_DATA
 -----END CERTIFICATE-----"""
         
         with patch('builtins.open', mock_open(read_data=invalid_content)):
-            result = certificator.parse_existing_certificates("test.pem")
+            result = certificatinator.parse_existing_certificates("test.pem")
             
         self.assertEqual(result, set())
 
     def test_format_certificate_info(self):
         """Test certificate formatting."""
-        formatted = certificator.format_certificate_info(self.test_cert)
+        formatted = certificatinator.format_certificate_info(self.test_cert)
         
         # Check that all required fields are present
         self.assertIn("# Issuer:", formatted)
@@ -178,15 +178,15 @@ INVALID_CERTIFICATE_DATA
             datetime.utcnow() + timedelta(days=365)
         ).sign(private_key, hashes.SHA256())
         
-        formatted = certificator.format_certificate_info(cert)
+        formatted = certificatinator.format_certificate_info(cert)
         
         self.assertIn("CN=minimal.example.com", formatted)
         self.assertIn("# Serial: 12345", formatted)
 
     @patch('builtins.input')
     @patch('builtins.print')
-    @patch('certificator.get_certificates_from_url')
-    @patch('certificator.parse_existing_certificates')
+    @patch('certificatinator.get_certificates_from_url')
+    @patch('certificatinator.parse_existing_certificates')
     @patch('builtins.open', new_callable=mock_open)
     def test_main_no_new_certificates(self, mock_file, mock_parse, mock_get_certs, mock_print, mock_input):
         """Test main function when no new certificates are found."""
@@ -196,16 +196,16 @@ INVALID_CERTIFICATE_DATA
         mock_parse.return_value = {fingerprint}
         
         # Mock command line arguments
-        with patch('sys.argv', ['certificator', 'https://example.com', 'test.pem']):
-            certificator.main()
+        with patch('sys.argv', ['certificatinator', 'https://example.com', 'test.pem']):
+            certificatinator.main()
         
         # Verify that the "no new certificates" message was printed
         mock_print.assert_any_call("No new certificates found. All certificates are already present in the bundle.")
 
     @patch('builtins.input')
     @patch('builtins.print')
-    @patch('certificator.get_certificates_from_url')
-    @patch('certificator.parse_existing_certificates')
+    @patch('certificatinator.get_certificates_from_url')
+    @patch('certificatinator.parse_existing_certificates')
     @patch('builtins.open', new_callable=mock_open)
     def test_main_user_accepts_certificate(self, mock_file, mock_parse, mock_get_certs, mock_print, mock_input):
         """Test main function when user accepts a new certificate."""
@@ -215,8 +215,8 @@ INVALID_CERTIFICATE_DATA
         mock_input.return_value = 'y'  # User accepts
         
         # Mock command line arguments
-        with patch('sys.argv', ['certificator', 'https://example.com', 'test.pem']):
-            certificator.main()
+        with patch('sys.argv', ['certificatinator', 'https://example.com', 'test.pem']):
+            certificatinator.main()
         
         # Verify file was opened for appending
         mock_file.assert_called_with('test.pem', 'a')
@@ -226,8 +226,8 @@ INVALID_CERTIFICATE_DATA
 
     @patch('builtins.input')
     @patch('builtins.print')
-    @patch('certificator.get_certificates_from_url')
-    @patch('certificator.parse_existing_certificates')
+    @patch('certificatinator.get_certificates_from_url')
+    @patch('certificatinator.parse_existing_certificates')
     def test_main_user_rejects_certificate(self, mock_parse, mock_get_certs, mock_print, mock_input):
         """Test main function when user rejects a new certificate."""
         # Setup mocks
@@ -236,28 +236,28 @@ INVALID_CERTIFICATE_DATA
         mock_input.return_value = 'n'  # User rejects
         
         # Mock command line arguments
-        with patch('sys.argv', ['certificator', 'https://example.com', 'test.pem']):
-            certificator.main()
+        with patch('sys.argv', ['certificatinator', 'https://example.com', 'test.pem']):
+            certificatinator.main()
         
         # Verify rejection message
         mock_print.assert_any_call("No certificates selected for addition.")
 
     @patch('builtins.input')
     @patch('builtins.print')
-    @patch('certificator.get_certificates_from_url')
+    @patch('certificatinator.get_certificates_from_url')
     def test_main_connection_error(self, mock_get_certs, mock_print, mock_input):
         """Test main function with connection error."""
         # Setup mock to raise exception
         mock_get_certs.side_effect = Exception("Connection failed")
         
         # Mock command line arguments
-        with patch('sys.argv', ['certificator', 'https://example.com', 'test.pem']):
+        with patch('sys.argv', ['certificatinator', 'https://example.com', 'test.pem']):
             with self.assertRaises(SystemExit):
-                certificator.main()
+                certificatinator.main()
 
     def test_fingerprint_formatting(self):
         """Test that fingerprints are formatted correctly with colons."""
-        formatted = certificator.format_certificate_info(self.test_cert)
+        formatted = certificatinator.format_certificate_info(self.test_cert)
         
         # Extract fingerprint lines
         lines = formatted.split('\n')
@@ -324,12 +324,12 @@ class TestCertificateIntegration(unittest.TestCase):
         ).sign(private_key, hashes.SHA256())
         
         # Format and write certificate
-        formatted = certificator.format_certificate_info(cert)
+        formatted = certificatinator.format_certificate_info(cert)
         with open(self.cert_file, 'w') as f:
             f.write(formatted)
         
         # Parse it back
-        fingerprints = certificator.parse_existing_certificates(self.cert_file)
+        fingerprints = certificatinator.parse_existing_certificates(self.cert_file)
         
         # Verify the fingerprint matches
         expected_fingerprint = cert.fingerprint(hashes.SHA256()).hex()

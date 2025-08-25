@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Certificator - A tool to manage SSL certificates in certifi-style bundles.
+Certificatinator - A tool to manage SSL certificates in certifi-style bundles.
 
-Usage: certificator <url> <cert_file_path>
+Usage: certificatinator <url> <cert_file_path>
 """
 
 import argparse
