@@ -9,16 +9,10 @@ import argparse
 import ssl
 import socket
 import sys
-import warnings
 from urllib.parse import urlparse
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 import re
-
-# Suppress cryptography deprecation warnings for negative serial numbers
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="cryptography")
-from cryptography.utils import CryptographyDeprecationWarning
-warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 
 
 def get_certificates_from_url(url):
