@@ -29,17 +29,28 @@ def get_certificates_from_url(url):
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
     
-    # Connect and get certificate
+    certificates = []
+    
+    # Connect and get certificate chain
     with socket.create_connection((hostname, port), timeout=10) as sock:
         with context.wrap_socket(sock, server_hostname=hostname) as ssock:
             # Get the peer certificate in DER format
             der_cert_bin = ssock.getpeercert(True)
-    
-    # For now, we'll just get the server certificate
-    # Getting the full chain requires more complex SSL handling
-    certificates = []
-    cert = x509.load_der_x509_certificate(der_cert_bin)
-    certificates.append(cert)
+            cert = x509.load_der_x509_certificate(der_cert_bin)
+            certificates.append(cert)
+            
+            # Try to get the certificate chain using OpenSSL if available
+            try:
+                # Get the peer certificate chain if available
+                peer_cert_chain = ssock.getpeercert_chain()
+                if peer_cert_chain:
+                    certificates = []
+                    for cert_der in peer_cert_chain:
+                        cert = x509.load_der_x509_certificate(cert_der)
+                        certificates.append(cert)
+            except AttributeError:
+                # getpeercert_chain() not available, stick with single cert
+                pass
     
     return certificates
 
