@@ -1,1 +1,8 @@
 cryptography>=3.0.0
+pytest>=6.0.0
+pytest-cov>=2.10.0
+flake8>=3.8.0
+black>=21.0.0
+isort>=5.0.0
+bandit>=1.7.0
+safety>=1.10.0
