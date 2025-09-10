@@ -30,6 +30,13 @@ python certificatinator.py <url> <cert_file_path>
 
 ### Examples
 
+Finding the certs: 
+(default name for httpx based libraries which in turn are based on certify)
+```bash
+find -name cacert.pem
+```
+
+
 Add certificates from Google to a bundle file:
 ```bash
 python certificatinator.py https://google.com certificates.pem
@@ -47,16 +54,3 @@ python certificatinator.py https://example.com:8443 my_certs.pem
 3. Presents new certificates for interactive approval
 4. Adds approved certificates to the bundle file with detailed metadata
 
-## Testing
-
-Run the test suite:
-
-```bash
-pytest
-```
-
-## Requirements
-
-- Python 3.6+
-- cryptography >= 3.0.0
-- See `requirements.txt` for full dependency list
